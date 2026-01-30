@@ -51,7 +51,11 @@ export default function PartyLedgerTable({ partyLedger, limit = 10, showAll = fa
             {displayData.map((party, idx) => {
               const net = (party.total_credit || 0) - (party.total_debit || 0)
               return (
-                <tr key={idx} className="hover:bg-white/5">
+                <tr 
+                  key={idx} 
+                  className="hover:bg-white/5 cursor-pointer transition-colors"
+                  onClick={() => onPartyClick && onPartyClick(party.party_name)}
+                >
                   <td className="px-6 py-4 text-white font-medium">{party.party_name}</td>
                   <td className="px-6 py-4 text-right text-emerald-400">{formatCurrency(party.total_credit || 0)}</td>
                   <td className="px-6 py-4 text-right text-rose-400">{formatCurrency(party.total_debit || 0)}</td>
