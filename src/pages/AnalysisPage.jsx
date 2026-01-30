@@ -70,7 +70,7 @@ function AnalysisPage() {
     try {
       var formData = new FormData()
       files.forEach(function(file) { formData.append("files", file) })
-      var response = await fetch(API_URL + "/api/analyze/multi", { method: "POST", body: formData })
+      var response = await fetch(API_URL + "/api/analyze", {, { method: "POST", body: formData })
       if (!response.ok) throw new Error("Backend returned error")
       var result = await response.json()
       if (!result || !result.transactions) throw new Error("No transaction data found")
