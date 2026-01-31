@@ -39,7 +39,7 @@ export default function TopPartiesCards({ partyLedger }) {
     const Icon = isCredit ? TrendingUp : TrendingDown
     const colorClass = isCredit ? 'text-emerald-400' : 'text-rose-400'
     const bgClass = isCredit ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20'
-    
+
     return (
       <div className={`p-4 rounded-xl border ${bgClass} hover:bg-white/5 transition-all cursor-pointer`}>
         <div className="flex items-start justify-between mb-3">
@@ -69,7 +69,7 @@ export default function TopPartiesCards({ partyLedger }) {
   const FrequencyCard = ({ party, rank }) => {
     const net = (party.total_credit || 0) - (party.total_debit || 0)
     const isPositive = net >= 0
-    
+
     return (
       <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-white/5 transition-all cursor-pointer">
         <div className="flex items-start justify-between mb-3">

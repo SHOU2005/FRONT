@@ -42,6 +42,7 @@ export default function PartyLedgerTable({ partyLedger, limit = 10, showAll = fa
           <thead className="bg-white/5">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase">Party</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-white/60 uppercase">Type</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-white/60 uppercase">Credit</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-white/60 uppercase">Debit</th>
               <th className="px-6 py-3 text-right text-xs font-semibold text-white/60 uppercase">Net</th>
@@ -50,22 +51,42 @@ export default function PartyLedgerTable({ partyLedger, limit = 10, showAll = fa
           <tbody className="divide-y divide-white/10">
             {displayData.map((party, idx) => {
               const net = (party.total_credit || 0) - (party.total_debit || 0)
+              const isMerchant = party.entity_type === 'Merchant'
               return (
-                <tr 
-                  key={idx} 
+<<<<<<< HEAD
+                <tr
+                  key={idx}
                   className="hover:bg-white/5 cursor-pointer transition-colors"
                   onClick={() => onPartyClick && onPartyClick(party.party_name)}
                 >
                   <td className="px-6 py-4 text-white font-medium">{party.party_name}</td>
-                  <td className="px-6 py-4 text-right text-emerald-400">{formatCurrency(party.total_credit || 0)}</td>
-                  <td className="px-6 py-4 text-right text-rose-400">{formatCurrency(party.total_debit || 0)}</td>
-                  <td className={'px-6 py-4 text-right font-semibold ' + (net >= 0 ? 'text-emerald-400' : 'text-rose-400')}>
-                    {(net >= 0 ? '+' : '') + formatCurrency(net)}
-                  </td>
-                </tr>
-              )
+=======
+                <tr
+                    key={idx}
+                    className="hover:bg-white/5 cursor-pointer transition-colors"
+                    onClick={() => onPartyClick && onPartyClick(party.party_name)}
+                  >
+                    <td className="px-6 py-4 text-white font-medium">
+                      {party.party_name}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-0.5 rounded text-xs border ${isMerchant
+                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                        : 'bg-purple-500/10 border-purple-500/20 text-purple-400'
+                        }`}>
+                        {party.entity_type || 'Individual'}
+                      </span>
+                    </td>
+>>>>>>> e541bd42 (Initialize frontend repository with security features)
+                    <td className="px-6 py-4 text-right text-emerald-400">{formatCurrency(party.total_credit || 0)}</td>
+                    <td className="px-6 py-4 text-right text-rose-400">{formatCurrency(party.total_debit || 0)}</td>
+                    <td className={'px-6 py-4 text-right font-semibold ' + (net >= 0 ? 'text-emerald-400' : 'text-rose-400')}>
+                      {(net >= 0 ? '+' : '') + formatCurrency(net)}
+                    </td>
+                  </tr>
+                  )
             })}
-          </tbody>
+                </tbody>
         </table>
       </div>
     </div>

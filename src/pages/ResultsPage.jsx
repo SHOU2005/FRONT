@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  TrendingUp, TrendingDown, Users, GitBranch, Download, 
-  CheckCircle, FileText, FileJson, Wallet, CreditCard, Target, 
+import {
+  TrendingUp, TrendingDown, Users, GitBranch, Download,
+  CheckCircle, FileText, FileJson, Wallet, CreditCard, Target,
   Filter, Search, ChevronDown, RefreshCw, DollarSign, Calendar,
-  BarChart3, Home, PieChart, Hash, X, Copy
+  BarChart3, Home, PieChart, Hash, X, Copy, LogOut, Shield
 } from 'lucide-react'
 
 // Import components
@@ -16,6 +16,10 @@ import FundFlowVisualization from '../components/FundFlowVisualization'
 import PartyLedgerTable from '../components/PartyLedgerTable'
 import AccountProfileCard from '../components/AccountProfileCard'
 import TransactionDetailModal from '../components/TransactionDetailModal'
+import RecurringPaymentsCard from '../components/RecurringPaymentsCard'
+import NetworkGraph from '../components/NetworkGraph'
+import RiskScoreCard from '../components/RiskScoreCard'
+import InvestigationSummary from '../components/InvestigationSummary'
 
 export default function ResultsPage() {
   const navigate = useNavigate()
@@ -60,7 +64,11 @@ export default function ResultsPage() {
   }
   const fundFlowChains = results?.fund_flow_chains || {}
   const metadata = results?.metadata || {}
-  
+  const recurringTransactions = results?.recurring_transactions || []
+  const correlations = results?.correlations || []
+  const riskAnalysis = results?.risk_analysis || null
+  const investigationSummary = results?.investigation_summary || ''
+
   // Calculate totals from transactions (not from top-level fields which may not exist)
   const totalCredit = transactions.reduce((sum, txn) => sum + (txn.credit || 0), 0)
   const totalDebit = transactions.reduce((sum, txn) => sum + (txn.debit || 0), 0)
@@ -69,7 +77,7 @@ export default function ResultsPage() {
   const filteredTransactions = useMemo(() => {
     let filtered = transactions.filter(txn => {
       const amount = txn.credit > 0 ? txn.credit : txn.debit
-      
+
       if (filters.transactionType !== 'all') {
         if (filters.transactionType === 'credit' && txn.credit <= 0) return false
         if (filters.transactionType === 'debit' && txn.debit <= 0) return false
@@ -88,7 +96,7 @@ export default function ResultsPage() {
       filtered = filtered.filter(txn => {
         const date = new Date(txn.date)
         if (isNaN(date.getTime())) return true
-        
+
         switch (dateFilter) {
           case 'today':
             return date.toDateString() === now.toDateString()
@@ -188,14 +196,39 @@ export default function ResultsPage() {
   }
 
   const stats = [
-    { icon: FileText, label: 'Transactions', value: transactions.length, color: 'from-emerald-500 to-green-500' },
-    { icon: Users, label: 'Parties', value: partyLedger.length, color: 'from-green-500 to-emerald-500' },
-    { icon: GitBranch, label: 'Fund Flows', value: fundFlowChains.total_chains || 0, color: 'from-teal-500 to-cyan-500' },
-    { icon: DollarSign, label: 'Net Flow', value: '₹' + netFlow.toLocaleString(), color: netFlow >= 0 ? 'from-emerald-600 to-green-600' : 'from-rose-600 to-red-600' }
+    {
+      icon: FileText,
+      label: 'Transactions',
+      value: transactions.length,
+      color: 'from-emerald-500 to-green-500',
+      onClick: () => setActiveTab('transactions')
+    },
+    {
+      icon: Users,
+      label: 'Parties',
+      value: partyLedger.length,
+      color: 'from-green-500 to-emerald-500',
+      onClick: () => setActiveTab('parties')
+    },
+    {
+      icon: GitBranch,
+      label: 'Fund Flows',
+      value: fundFlowChains.total_chains || 0,
+      color: 'from-teal-500 to-cyan-500',
+      onClick: () => setActiveTab('fundflow')
+    },
+    {
+      icon: DollarSign,
+      label: 'Net Flow',
+      value: '₹' + netFlow.toLocaleString(),
+      color: netFlow >= 0 ? 'from-emerald-600 to-green-600' : 'from-rose-600 to-red-600',
+      onClick: null
+    }
   ]
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Home },
+    { id: 'risk', label: 'Risk Analysis', icon: Shield },
     { id: 'analysis', label: 'Analysis', icon: BarChart3 },
     { id: 'fundflow', label: 'Fund Flow', icon: GitBranch },
     { id: 'parties', label: 'Parties', icon: Users },
@@ -227,6 +260,10 @@ export default function ResultsPage() {
               AcuTrace
             </button>
             <div className="flex items-center gap-4">
+              <button onClick={() => navigate('/logout')} className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
               <button onClick={() => navigate('/analyze')} className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
                 <RefreshCw className="w-4 h-4" />
                 New Analysis
@@ -270,10 +307,14 @@ export default function ResultsPage() {
         {activeTab === 'overview' && (
           <div className="space-y-8">
             <AccountProfileCard accountProfile={accountProfile} />
-            
+
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, idx) => (
-                <div key={idx} className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+                <div
+                  key={idx}
+                  onClick={stat.onClick}
+                  className={`bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 transition-transform hover:scale-105 ${stat.onClick ? 'cursor-pointer hover:bg-white/10' : ''}`}
+                >
                   <div className={'w-12 h-12 rounded-xl bg-gradient-to-br ' + stat.color + ' flex items-center justify-center mb-4'}>
                     <stat.icon className="w-6 h-6 text-white" />
                   </div>
@@ -312,15 +353,77 @@ export default function ResultsPage() {
               </div>
             </div>
 
+
+            {/* Network Graph & Trends Row */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              <NetworkGraph
+                partyLedger={partyLedger}
+                onPartyClick={(partyName) => {
+                  setFilters(prev => ({ ...prev, party: partyName }))
+                  setActiveTab('transactions')
+                }}
+              />
+              <CategoryBreakdown transactions={transactions} />
+            </div>
+
+            {correlations.length > 0 && (
+              <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-teal-400" />
+                  Detected Internal Transfers / Reversals
+                </h3>
+                <div className="space-y-3">
+                  {correlations.map((corr, i) => (
+                    <div key={i} className="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-white/5">
+                      <div>
+                        <p className="text-emerald-400 font-medium">{corr.type}</p>
+                        <p className="text-xs text-white/50">{corr.date}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white font-bold">₹{corr.amount}</p>
+                        <p className="text-xs text-white/40">Matched across files</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <MonthlyTrendChart transactions={transactions} />
-            <CategoryBreakdown transactions={transactions} />
             <EnhancedStats transactions={transactions} />
             <TopPartiesCards partyLedger={partyLedger} />
           </div>
         )}
 
+        {activeTab === 'risk' && (
+          <div className="space-y-8">
+            {/* Risk Analysis Section */}
+            {riskAnalysis ? (
+              <>
+                <RiskScoreCard riskAnalysis={riskAnalysis} />
+                
+                {investigationSummary && (
+                  <InvestigationSummary 
+                    summary={investigationSummary} 
+                    riskAnalysis={riskAnalysis} 
+                  />
+                )}
+              </>
+            ) : (
+              <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-12 border border-white/10 text-center">
+                <Shield className="w-16 h-16 text-white/20 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-white mb-2">No Risk Analysis Available</h3>
+                <p className="text-white/50">
+                  Upload a bank statement to see automated risk detection and investigation summary.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'analysis' && (
           <div className="space-y-8">
+            <RecurringPaymentsCard recurringTransactions={recurringTransactions} />
             <MonthlyTrendChart transactions={transactions} />
             <CategoryBreakdown transactions={transactions} />
             <EnhancedStats transactions={transactions} />
@@ -332,15 +435,29 @@ export default function ResultsPage() {
         )}
 
         {activeTab === 'parties' && (
-          <PartyLedgerTable 
-            partyLedger={partyLedger} 
-            limit={20} 
-            showAll={true}
-            onPartyClick={(partyName) => {
-              setFilters(prev => ({ ...prev, party: partyName }))
-              setActiveTab('transactions')
-            }}
-          />
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  clearFilters()
+                  setActiveTab('transactions')
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-emerald-400 hover:bg-white/10 transition-colors"
+              >
+                <CreditCard className="w-4 h-4" />
+                View All Transactions
+              </button>
+            </div>
+            <PartyLedgerTable
+              partyLedger={partyLedger}
+              limit={20}
+              showAll={true}
+              onPartyClick={(partyName) => {
+                setFilters(prev => ({ ...prev, party: partyName }))
+                setActiveTab('transactions')
+              }}
+            />
+          </div>
         )}
 
         {activeTab === 'transactions' && (
@@ -361,8 +478,8 @@ export default function ResultsPage() {
 
               {showFilters && (
                 <div className="grid md:grid-cols-4 gap-4">
-                  <select 
-                    value={filters.transactionType} 
+                  <select
+                    value={filters.transactionType}
                     onChange={e => setFilters(p => ({ ...p, transactionType: e.target.value }))}
                     className="bg-black/30 text-white p-3 rounded-xl border border-white/10"
                   >
@@ -383,16 +500,16 @@ export default function ResultsPage() {
                     <option value="thisMonth">This Month</option>
                     <option value="lastMonth">Last Month</option>
                   </select>
-                  <input 
-                    placeholder="Filter by party..." 
+                  <input
+                    placeholder="Filter by party..."
                     value={filters.party}
                     onChange={e => setFilters(p => ({ ...p, party: e.target.value }))}
                     className="bg-black/30 text-white p-3 rounded-xl border border-white/10"
                   />
                   <div className="relative">
                     <Search className="absolute left-3 top-3 text-white/40 w-4 h-4" />
-                    <input 
-                      placeholder="Search narration..." 
+                    <input
+                      placeholder="Search narration..."
                       value={filters.searchTerm}
                       onChange={e => setFilters(p => ({ ...p, searchTerm: e.target.value }))}
                       className="bg-black/30 text-white pl-10 p-3 rounded-xl border border-white/10 w-full"
@@ -434,9 +551,9 @@ export default function ResultsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {filteredTransactions.slice(0, 100).map((txn, idx) => (
-                      <tr 
-                        key={idx} 
+                    {filteredTransactions.map((txn, idx) => (
+                      <tr
+                        key={idx}
                         className="hover:bg-white/5 cursor-pointer transition-colors"
                         onClick={() => setSelectedTransaction(txn)}
                       >
@@ -456,9 +573,9 @@ export default function ResultsPage() {
                         <td className="p-4">
                           <span className={'px-3 py-1 rounded-lg text-sm font-medium ' + (
                             txn.category?.toLowerCase().includes('credit') ? 'bg-emerald-500/20 text-emerald-400' :
-                            txn.category?.toLowerCase().includes('debit') ? 'bg-rose-500/20 text-rose-400' :
-                            txn.category?.toLowerCase().includes('upi') ? 'bg-purple-500/20 text-purple-400' :
-                            'bg-blue-500/20 text-blue-400'
+                              txn.category?.toLowerCase().includes('debit') ? 'bg-rose-500/20 text-rose-400' :
+                                txn.category?.toLowerCase().includes('upi') ? 'bg-purple-500/20 text-purple-400' :
+                                  'bg-blue-500/20 text-blue-400'
                           )}>
                             {txn.category || 'Transfer'}
                           </span>
@@ -468,11 +585,6 @@ export default function ResultsPage() {
                   </tbody>
                 </table>
               </div>
-              {filteredTransactions.length > 100 && (
-                <p className="text-center mt-4 text-white/50">
-                  Showing first 100 of {filteredTransactions.length} transactions
-                </p>
-              )}
               {filteredTransactions.length === 0 && (
                 <p className="text-center mt-4 text-white/50 py-8">
                   No transactions match your filters
@@ -483,8 +595,8 @@ export default function ResultsPage() {
         )}
 
         {selectedTransaction && (
-          <TransactionDetailModal 
-            transaction={selectedTransaction} 
+          <TransactionDetailModal
+            transaction={selectedTransaction}
             onClose={() => setSelectedTransaction(null)}
             onPartyClick={(partyName) => {
               setFilters(prev => ({ ...prev, party: partyName }))

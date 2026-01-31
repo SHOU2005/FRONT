@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   TrendingUp, Link2, GitBranch, Users, Shield, Lock, 
   ChevronRight, CheckCircle, ArrowRight, Sparkles,
-  Target, Wallet, FileSpreadsheet, FileJson
+  Target, Wallet, FileSpreadsheet, FileJson, LogOut
 } from 'lucide-react'
 
 const features = [
@@ -86,6 +86,13 @@ export default function LandingPage() {
               AcuTrace
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate('/logout')}
+                className="flex items-center gap-2 px-4 py-2 text-white/60 hover:text-white transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
               <button
                 onClick={() => navigate('/analyze')}
                 className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold hover:opacity-90 transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/25"

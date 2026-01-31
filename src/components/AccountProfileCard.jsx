@@ -6,7 +6,16 @@ import { Building2, User, MapPin, Calendar, Phone, Mail, CreditCard, Landmark, G
  */
 export default function AccountProfileCard({ accountProfile }) {
   if (!accountProfile || Object.keys(accountProfile).length === 0) {
-    return null
+    return (
+      <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 flex flex-col items-center justify-center text-center">
+        <Landmark className="w-12 h-12 text-white/20 mb-4" />
+        <h3 className="text-lg font-bold text-white mb-2">No Account Details Detected</h3>
+        <p className="text-sm text-white/40 max-w-sm">
+          We couldn't automatically find account details in this statement format.
+          You can still view all transactions in the tabs below.
+        </p>
+      </div>
+    )
   }
 
   const {

@@ -1,10 +1,13 @@
-import { GitBranch, ArrowRight, TrendingUp, Users, Link2, Activity } from 'lucide-react'
+import { GitBranch, ArrowRight, TrendingUp, Users, Link2, Activity, ChevronDown, ChevronUp } from 'lucide-react'
+import { useState } from 'react'
 
 /**
  * FundFlowVisualization - Visual representation of fund flow chains
  * Uses consistent emerald theme styling with glowing effects
  */
 export default function FundFlowVisualization({ fundFlowChains, entityRelations = [] }) {
+  const [visibleChains, setVisibleChains] = useState(10)
+  
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -22,6 +25,9 @@ export default function FundFlowVisualization({ fundFlowChains, entityRelations 
 
   const topChains = fundFlowChains?.top_chains || []
   const chainSummary = fundFlowChains || {}
+  const totalChains = chainSummary.total_chains || topChains.length
+  const showAll = visibleChains >= topChains.length
+  const visibleChainsList = topChains.slice(0, visibleChains)
 
   if (topChains.length === 0) {
     return (
@@ -31,6 +37,14 @@ export default function FundFlowVisualization({ fundFlowChains, entityRelations 
         <p className="text-sm text-white/30">Upload multiple files or add more transactions to see fund flow chains</p>
       </div>
     )
+  }
+
+  const handleShowMore = () => {
+    setVisibleChains(topChains.length)
+  }
+
+  const handleShowLess = () => {
+    setVisibleChains(10)
   }
 
   return (
@@ -44,7 +58,7 @@ export default function FundFlowVisualization({ fundFlowChains, entityRelations 
             </div>
             <span className="text-white/60 text-sm">Total Chains</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-400">{chainSummary.total_chains || 0}</p>
+          <p className="text-2xl font-bold text-emerald-400">{totalChains}</p>
         </div>
         
         <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10">
@@ -95,7 +109,7 @@ export default function FundFlowVisualization({ fundFlowChains, entityRelations 
 
         {/* Chain List */}
         <div className="divide-y divide-white/10">
-          {topChains.map((chain, idx) => {
+          {visibleChainsList.map((chain, idx) => {
             const parties = chain.flow_path?.split(' -> ') || []
             
             return (
@@ -152,6 +166,39 @@ export default function FundFlowVisualization({ fundFlowChains, entityRelations 
             )
           })}
         </div>
+
+        {/* Pagination Controls */}
+        {topChains.length > 10 && (
+          <div className="px-6 py-4 bg-white/5 border-t border-white/10">
+            {/* Showing indicator */}
+            <div className="text-center text-white/50 text-sm mb-3">
+              Showing {visibleChains} of {topChains.length} chains
+            </div>
+            
+            {/* Show More / Show Less buttons */}
+            <div className="flex justify-center gap-3">
+              {!showAll ? (
+                <button
+                  onClick={handleShowMore}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl font-medium hover:opacity-90 transition-all shadow-lg shadow-emerald-500/20"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  Show More ({topChains.length - visibleChains} remaining)
+                </button>
+              ) : (
+                visibleChains > 10 && (
+                  <button
+                    onClick={handleShowLess}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all border border-white/20"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                    Show Less
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Cross-File Links Indicator */}
