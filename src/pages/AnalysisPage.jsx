@@ -1,9 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-<<<<<<< HEAD
-=======
 import axios from 'axios'
->>>>>>> e541bd42 (Initialize frontend repository with security features)
 import { Upload, FileSpreadsheet, CheckCircle, Loader, Users, GitBranch, Target, FileText, X, ArrowRight, Sparkles, Files, Layers, BarChart3, LogOut } from 'lucide-react'
 
 // Auto-detect API URL based on current host for network access
@@ -293,19 +290,11 @@ function AnalysisPage() {
             AcuTrace
           </button>
           <div className="flex items-center gap-4">
-<<<<<<< HEAD
-            <button onClick={function() { navigate("/logout") }} className="flex items-center gap-2 text-white/60 hover:text-white text-sm px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
-            <button onClick={function() { navigate("/results") }} className="text-white/80 hover:text-white text-sm px-4 py-2 rounded-xl hover:bg-white/10 transition-all">View Results</button>
-=======
             <button onClick={function () { navigate("/logout") }} className="flex items-center gap-2 text-white/60 hover:text-white text-sm px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
               <LogOut className="w-4 h-4" />
               Logout
             </button>
             <button onClick={function () { navigate("/results") }} className="text-white/80 hover:text-white text-sm px-4 py-2 rounded-xl hover:bg-white/10 transition-all">View Results</button>
->>>>>>> e541bd42 (Initialize frontend repository with security features)
           </div >
         </div >
       </nav >
