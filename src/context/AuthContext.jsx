@@ -3,6 +3,17 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
+// Auto-detect API URL based on current host for network access
+const getApiUrl = () => {
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL;
+    }
+    // Fallback to current origin but with port 8000 for backend
+    return window.location.origin.replace(/:\d+$/, ':8000') || 'http://localhost:8000';
+};
+
+const API_URL = getApiUrl();
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -31,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         const verifyToken = async () => {
             if (token) {
                 try {
-                    const response = await axios.get('http://localhost:8000/api/auth/me');
+                    const response = await axios.get(`${API_URL}/api/auth/me`);
                     setUser(response.data);
                 } catch (error) {
                     console.error('Token verification failed', error);
@@ -46,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const response = await axios.post('http://localhost:8000/api/auth/login', {
+            const response = await axios.post(`${API_URL}/api/auth/login`, {
                 username,
                 password
             });
