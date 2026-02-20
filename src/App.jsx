@@ -5,7 +5,7 @@ import AnalysisPage from './pages/AnalysisPage';
 import ResultsPage from './pages/ResultsPage';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useAuth } from './context/AuthContext';
+
 
 // Logout component to clear session and redirect
 function Logout() {
