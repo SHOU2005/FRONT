@@ -12,7 +12,7 @@ const ALLOWED_EXTS = ['.xls', '.xlsx']
 
 const steps = [
   { id: 'upload',   label: 'Uploading Files',           icon: Files },
-  { id: 'extract',  label: 'Extracting Transactions',   icon: FileText },
+  { id: 'extract',  label: 'Extracting Transactions',   icon: FileSpreadsheet },
   { id: 'merge',    label: 'Merging Data',              icon: Layers },
   { id: 'party',    label: 'Detecting Parties',         icon: Users },
   { id: 'chains',   label: 'Building Fund Flow Chains', icon: GitBranch },
