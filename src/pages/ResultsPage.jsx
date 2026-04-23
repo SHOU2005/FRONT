@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { 
-  TrendingUp, TrendingDown, Users, GitBranch, Download, 
-  CheckCircle, FileText, FileJson, Wallet, CreditCard, Target, 
+import {
+  TrendingUp, TrendingDown, Users, GitBranch, Download,
+  CheckCircle, FileText, FileJson, Wallet, CreditCard, Target,
   Filter, Search, ChevronDown, RefreshCw, DollarSign, Calendar,
-  BarChart3, Home, PieChart, Hash, X, Copy
+  BarChart3, Home, PieChart, Hash, X, Copy, LogOut
 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 // Import components
 import MonthlyTrendChart from '../components/MonthlyTrendChart'
@@ -17,8 +18,21 @@ import PartyLedgerTable from '../components/PartyLedgerTable'
 import AccountProfileCard from '../components/AccountProfileCard'
 import TransactionDetailModal from '../components/TransactionDetailModal'
 
+function safeParseResults(raw) {
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    // Minimal shape validation to prevent acting on corrupted/tampered data
+    if (typeof parsed !== 'object' || !Array.isArray(parsed.transactions)) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
 export default function ResultsPage() {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const [results, setResults] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [showFilters, setShowFilters] = useState(false)
@@ -35,7 +49,9 @@ export default function ResultsPage() {
   useEffect(() => {
     const stored = sessionStorage.getItem('analysisResults')
     if (stored) {
-      setResults(JSON.parse(stored))
+      const parsed = safeParseResults(stored)
+      if (parsed) setResults(parsed)
+      else navigate('/analyze')
     } else {
       navigate('/analyze')
     }
@@ -231,6 +247,12 @@ export default function ResultsPage() {
                 <RefreshCw className="w-4 h-4" />
                 New Analysis
               </button>
+              <div className="flex items-center gap-2 text-white/50 text-sm">
+                <span className="hidden sm:inline">{user?.username}</span>
+                <button onClick={logout} title="Sign out" className="p-2 rounded-lg hover:bg-white/10 transition-all text-white/50 hover:text-white">
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

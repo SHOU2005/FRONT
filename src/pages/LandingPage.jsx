@@ -48,11 +48,11 @@ const stats = [
   { value: "20+", label: "Files Max" },
   { value: "4", label: "Filter Types" },
   { value: "100%", label: "Party Focus" },
-  { value: "XLS/PDF", label: "Both Supported" }
+  { value: "XLS/XLSX", label: "Supported" }
 ]
 
 const benefits = [
-  { title: "XLS/XLSX & PDF Support", desc: "Upload both Excel and PDF bank statements for comprehensive analysis" },
+  { title: "XLS/XLSX Support", desc: "Upload Excel bank statements (XLS and XLSX formats) for comprehensive analysis" },
   { title: "Instant Analysis", desc: "Upload → Parse → Party Detect → Fund Flow ready" },
   { title: "Smart Party Detection", desc: "AI normalizes names, handles spelling errors" },
   { title: "Fund Flow Explorer", desc: "Follow complete money journey between parties" },
