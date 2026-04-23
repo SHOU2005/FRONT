@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useCallback } from 'react'
+import API_BASE from '../utils/api'
 
 const AuthContext = createContext(null)
 
 const TOKEN_KEY = 'acutrace_token'
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY))
